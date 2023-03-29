@@ -1,9 +1,9 @@
 import { ParseResult, ParseResultItem } from './parser/parserBase';
 // @ts-ignore
-import * as pd from 'node-pandas';
+import * as pd from './node-pandas/src';
 import { dataFilePathGetter } from './const';
 import { getEmbedding } from './embeddingUtil';
-import { csvStringReplace, minifyCode } from './util';
+import { csvStringReplace } from './util';
 
 export type CSVDataItem = ParseResultItem & {
   codeEmbedding: string,
@@ -15,7 +15,7 @@ async function generateEmbedings(datas: ParseResult) {
   async function getCodeEmbeddings() {
     for (const data of datas as CSVData) {
       console.log('current process embedding ===> ', data.filePath + '/' + data.functionName);
-      const codeEmbedding = await getEmbedding(process.env.MINIFY_CODE == 'true' ? minifyCode(data.code) : data.code);
+      const codeEmbedding = await getEmbedding(data.code);
       data.codeEmbedding = '"[' + codeEmbedding.join(',') + ']"';
     }
   }

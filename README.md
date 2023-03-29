@@ -41,8 +41,4 @@ ignore parse dirs, type to be string[]
 
 parse file ext, type to be string[]
 
-**MINIFY_CODE**
-
-set to true can minify your code, can save some tokens
-
 ### Welcome to contribute😀

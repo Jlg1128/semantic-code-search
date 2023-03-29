@@ -3,6 +3,7 @@ import * as path from 'path';
 import { Parser } from './parser/parserBase';
 import * as dotenv from 'dotenv';
 import { DOUBLE_QUOTES_PLACEHOLDER, ROOT_PATH } from './const';
+import { Configuration, OpenAIApi } from 'openai';
 //@ts-ignore
 import * as minify from 'babel-minify';
 
@@ -11,9 +12,28 @@ interface ArgsMap {
 }
 let parseInfo: ArgsMap | undefined = undefined;
 
-function loadEnv() {
-  const parseTarget = getParseArgs().parseTarget || 'example';
-  dotenv.config({path: ROOT_PATH + `/.${parseTarget}.env`})
+function loadEnv(parseTarget?: string) {
+  if (!parseTarget) {
+    parseTarget = getParseArgs().parseTarget || 'example';
+  }
+  const envFile = ROOT_PATH + `/.${parseTarget}.env`;
+  dotenv.config({path: envFile, override: true});
+  console.log(`current using ===> ${envFile} as env file`)
+}
+
+let configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+let openai = new OpenAIApi(configuration);
+
+function getOpenaiApi() {
+  if (process.env.OPENAI_API_KEY && configuration.apiKey !== process.env.OPENAI_API_KEY) {
+    configuration = new Configuration({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+    openai = new OpenAIApi(configuration);
+  }
+  return openai;
 }
 
 function getParseArgs(): ArgsMap{
@@ -125,4 +145,5 @@ export {
   loadEnv,
   minifyCode,
   csvStringReplace,
+  getOpenaiApi,
 }
