@@ -14,3 +14,8 @@ export const DATA_PATH = ROOT_PATH + '/data';
 export const dataFileNameGetter = () => `${getParseRepoName()}-${getParserName()}.csv`;
 export const dataFilePathGetter = () => DATA_PATH + `/${getParseRepoName()}-${getParserName()}.csv`;
 export const DOUBLE_QUOTES_PLACEHOLDER = '@@';
+
+export const serverPort = (function() {
+  const portIndex = process.argv.indexOf('--port') + 1;
+  return portIndex ? process.argv[portIndex] : 3060 
+})()

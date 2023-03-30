@@ -1,5 +1,5 @@
 ## Semantic-code-search
-search code semantically for function search, logic multiplexing, can save develop time.
+search code semantically for function search, logic multiplexing, can save develop time, support docker deploy.
 
 ### Usage
 1. install dependencies
@@ -15,6 +15,13 @@ search code semantically for function search, logic multiplexing, can save devel
     ```
     npm run search:example
     ```
+    also you can **deploy the search server** by run
+    ```sh
+    docker compose build
+    docker compose up
+    ```
+    then call http://localhost:3060/?keyword=testServer&target=example
+
 ### Command Line Parameters
 **parseTarget**
 
@@ -40,5 +47,23 @@ ignore parse dirs, type to be string[]
 **EXT**
 
 parse file ext, type to be string[]
+
+### Search API CALL Parameters
+
+**keyword**
+
+query text
+
+**target**
+
+the env file, if set target 'example', will load .example.env
+
+**n**
+
+top n results
+
+**lines**
+
+max code lines in searchResult item
 
 ### Welcome to contribute😀

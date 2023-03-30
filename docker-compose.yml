@@ -1,0 +1,10 @@
+version: '3'
+services:
+  app:
+    build: .
+    volumes:
+      - ./data:/usr/src/semantic-code-search/data
+    container_name: semantic-code-search
+    ports:
+      - 3060:3060
+    command: npm run server --port 3060

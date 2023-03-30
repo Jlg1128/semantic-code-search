@@ -1,4 +1,4 @@
-const dataType = require('./dataType') // require('dataType') => Error: Cannot find module 'dataType'
+const dataType = require('./dataType')
 const getTransformedDataList = require('./getTransformedDataList')
 const getIndicesColumns = require('./getIndicesColumns')
 const excludingColumns = require("./excludingColumns")

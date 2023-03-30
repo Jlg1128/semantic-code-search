@@ -9,7 +9,7 @@ import { csvStringReplace } from './util';
 import { dataFilePathGetter } from './const';
 import { getEmbedding } from './embeddingUtil';
 
-export default async function search(codeQuery: string, n = 3, lines: number | undefined) { 
+export default async function search(codeQuery: string, n = 3, lines?: number | undefined) { 
   const results: CSVData = [];
   const dataFilePath = dataFilePathGetter();
   if (!fs.existsSync(dataFilePath)) {

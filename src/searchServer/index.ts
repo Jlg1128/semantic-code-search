@@ -2,9 +2,9 @@ import * as express from 'express';
 import { Request } from "express";
 import searchFunction from '../searchFunction';
 import { loadEnv } from '../util';
+import { serverPort } from '../const';
 
 const app = express();
-const port = 3060;
 type SearchParams = {
   keyword: string,
   model?: string,
@@ -24,7 +24,7 @@ app.get('/', async (req: Request, res) => {
   }
 })
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+app.listen(serverPort, () => {
+  console.log(`code-search server listening on port ${serverPort}`)
 })
 
