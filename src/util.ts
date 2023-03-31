@@ -98,11 +98,15 @@ function traverseDirAndParse(parser: Parser, repoPath: string, options: {exclude
       }
       const fileStr = fs.readFileSync(tempFilePath, 'utf-8');
       const relativePath = tempFilePath.replace(getParseRepoPath(), '').replace(/^\//, '');
-      const res = parser(fileStr, relativePath);
       console.log('current parsing ===> ', relativePath, '\n');
-      res.forEach(item => item.filePath = relativePath);
-      if (res.length) {
-        parseResult.push(...res)
+      try {
+        const res = parser(fileStr, relativePath);
+        if (res && res.length) {
+          res.forEach(item => item.filePath = relativePath);
+          parseResult.push(...res)
+        } 
+      } catch (error) {
+        console.log('parse error', error);
       }
     }
     else {
@@ -124,7 +128,7 @@ function minifyCode(code: string) {
 }
 
 function csvStringReplace(str: string, type: 'set' | 'get' = 'set'): string {
-  if (!/\n/.test(str) || typeof str !== 'string') {
+  if (!/[,\n]/.test(str) || typeof str !== 'string') {
     return str;
   }
   if (type === 'set') {
