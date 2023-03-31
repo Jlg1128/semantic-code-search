@@ -54,7 +54,7 @@ function getParserName() {
 }
 
 function getParseRepoPath() {
-  return (process.env.REPOPATH || ROOT_PATH)+ '/example-repo';
+  return process.env.REPOPATH || (ROOT_PATH || '/example-repo');
 }
 
 function getParseRepoName() {
