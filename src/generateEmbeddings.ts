@@ -14,9 +14,11 @@ export type CSVData = CSVDataItem[]
 async function generateEmbedings(datas: ParseResult) {
   async function getCodeEmbeddings() {
     for (const data of datas as CSVData) {
-      console.log('current process embedding ===> ', data.filePath + '/' + data.functionName);
-      const codeEmbedding = await getEmbedding(data.code);
-      data.codeEmbedding = '"[' + codeEmbedding.join(',') + ']"';
+      console.log('current processing embedding ===> ', data.filePath + '/' + data.functionName);
+        const codeEmbedding = await getEmbedding(data.code);
+        if (codeEmbedding) {
+          data.codeEmbedding = '[' + codeEmbedding.join(',') + ']';
+        };
     }
   }
   await getCodeEmbeddings();

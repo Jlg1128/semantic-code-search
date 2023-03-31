@@ -9,24 +9,25 @@ import { csvStringReplace } from './util';
 import { dataFilePathGetter } from './const';
 import { getEmbedding } from './embeddingUtil';
 
+type Cache = {
+  [key: string]: any,
+}
+
+const cache: Cache = {}
+
 export default async function search(codeQuery: string, n = 3, lines?: number | undefined) { 
-  const results: CSVData = [];
   const dataFilePath = dataFilePathGetter();
-  if (!fs.existsSync(dataFilePath)) {
-    return Promise.reject('embedding file not exists');
-  }
-
-  const queryEmbedding = await getEmbedding(codeQuery);
-  return new Promise((resolve, reject) => {
-    fs.createReadStream(dataFilePath)
-    .pipe(csv())
-    .on('data', (data) => results.push(data))
-    .on('end', () => {
-      let df:CSVData = null;
-      try {
-        df = pd.DataFrame(results);
-      } catch (error) { /* empty */ }
-
+  return new Promise(async (resolve, reject) => {
+    if (!fs.existsSync(dataFilePath)) {
+      return reject(new Error('embedding file not exists'));
+    }
+    let queryEmbedding: number[];
+    try {
+      queryEmbedding = await getEmbedding(codeQuery);
+    } catch (error) {
+      return reject(error?.message);
+    }
+    getCSVSource(dataFilePath).then(df => {
       df.forEach((dfItem: CSVDataItem, index) => {
         const embeddingItem = eval(dfItem.codeEmbedding);
         dfItem['similarity'] = similarity(embeddingItem, queryEmbedding);
@@ -44,6 +45,27 @@ export default async function search(codeQuery: string, n = 3, lines?: number | 
         };
       });
       resolve(searchResult);
-    }).on('error', reject);
+    }).catch(err => {
+      reject(err);
+    });
+  })
+}
+
+function getCSVSource(dataFilePath: string): Promise<CSVData> {
+  return new Promise((resolve, reject) => {
+    if (cache[dataFilePath]) {
+      resolve(cache[dataFilePath])
+    } else {
+      const results: CSVData = []
+      fs.createReadStream(dataFilePath)
+      .pipe(csv())
+      .on('data', (data) => results.push(data))
+      .on('end', () => {
+        resolve(cache[dataFilePath] = pd.DataFrame(results));
+      }).on('error', (err) => {
+        delete cache[dataFilePath];
+        reject(err);
+      });
+    }
   })
 }

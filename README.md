@@ -20,7 +20,7 @@ search code semantically for function search, logic multiplexing, can save devel
     docker compose build
     docker compose up
     ```
-    then call http://localhost:3060/?keyword=testServer&target=example
+    then call http://localhost:3060/?keyword=testServer&target=example, you can set **DEFAULT_TARGET** in docker-compose.yml that you don't have to pass **target**
 
 ### Command Line Parameters
 **parseTarget**

@@ -5,6 +5,8 @@ services:
     volumes:
       - ./data:/usr/src/semantic-code-search/data
     container_name: semantic-code-search
+    environment:
+      DEFAULT_TARGET: example
     ports:
       - 3060:3060
     command: npm run server --port 3060

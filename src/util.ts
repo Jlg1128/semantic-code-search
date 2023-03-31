@@ -128,7 +128,7 @@ function minifyCode(code: string) {
 }
 
 function csvStringReplace(str: string, type: 'set' | 'get' = 'set'): string {
-  if (!/[,\n]/.test(str) || typeof str !== 'string') {
+  if (!/[,\n"]/.test(str) || typeof str !== 'string') {
     return str;
   }
   if (type === 'set') {

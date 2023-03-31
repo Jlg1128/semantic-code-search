@@ -9,8 +9,8 @@ function comments2String(comments: Comment[] = []) {
   return comments.map(item => item.value).join('')
 }
 
-function genFunctionString(name: string, comment: string, body: string): string {
-  return (comment ? `/**${comment}*/ ` : '') + body
+function getFunctionString(source: string, node: t.ObjectMethod | t.FunctionExpression | t.VariableDeclarator | t.FunctionDeclaration | t.ClassMethod) {
+  return source.slice(node.start, node.end);
 }
 
 function getFunctionName(key: any) {
@@ -32,23 +32,19 @@ function parseFunctions(source: string, filePath: string): ParseResult {
     ObjectMethod(path) {
       const functionNode = path.node;
       const functionName = getFunctionName(functionNode.key);
-      const functionBody = generate(functionNode.body).code;
       const functionComment = comments2String(functionNode.leadingComments);
-      const functionAll = generate(functionNode).code;
-      result.push({functionName, code: functionAll, comment: functionComment, filePath});
+      result.push({functionName, code: getFunctionString(source, functionNode), comment: functionComment, filePath});
     },
     ObjectProperty(path) {
       const node = path.node;
       if (isFunctionExpression(node.value)) {
         const functionNode = node.value;
-        const functionBody = generate(functionNode.body).code;
         const functionName = getFunctionName(node.key)
         if (!node.value.id) {
           node.value.id = identifier(functionName);
         }
-        const functionAll = generate(functionNode).code;
         const functionComment = comments2String(path.node.leadingComments);
-        result.push({functionName, code: functionAll, comment: functionComment, filePath});
+        result.push({functionName, code: getFunctionString(source, functionNode), comment: functionComment, filePath});
       }
     },
     VariableDeclarator(path) {
@@ -56,39 +52,31 @@ function parseFunctions(source: string, filePath: string): ParseResult {
       if (isArrowFunctionExpression(node.init)) {
         const exp = node.init;
         const functionName = getFunctionName(node.id);
-        const functionBody = generate(exp.body).code;
         const functionComment = comments2String(path.parent.leadingComments);
-        const functionAll = generate(node).code;
-        result.push({functionName, code: functionAll, comment: functionComment, filePath});
+        result.push({functionName, code: getFunctionString(source, node), comment: functionComment, filePath});
       } else if (isFunctionExpression(node.init)) {
         const exp = node.init;
         const functionName = getFunctionName(node.id);
         if (!exp.id) {
           exp.id = identifier(functionName);
         }
-        const functionBody = generate(exp.body).code;
         const functionComment = comments2String(path.parent.leadingComments);
-        const functionAll = generate(node.init).code;
-        result.push({functionName, code: functionAll, comment: functionComment, filePath});
+        result.push({functionName, code: getFunctionString(source, node.init), comment: functionComment, filePath});
       }
     },
     FunctionDeclaration(path) {
       const node = path.node;
       const functionName = getFunctionName(node.id);
-      const functionBody = generate(node.body).code;
       const functionComment = comments2String(node.leadingComments);
-      const functionAll = generate(node).code;
-      result.push({functionName, code: functionAll, comment: functionComment, filePath});
+      result.push({functionName, code: getFunctionString(source, node), comment: functionComment, filePath});
     },
     ClassMethod(path) {
       const node = path.node;
       const functionName = getFunctionName(node.key);
-      const functionBody = generate(node.body).code;
       const functionComment = comments2String(node.leadingComments);
       delete node.leadingComments;
       delete node.trailingComments;
-      const functionAll = generate(node).code;
-      result.push({functionName, code: functionAll, comment: functionComment, filePath});
+      result.push({functionName, code: getFunctionString(source, node), comment: functionComment, filePath});
     }
   });
   return result;
