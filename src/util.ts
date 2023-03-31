@@ -79,12 +79,13 @@ function getParseExt(): string[] {
 
 function getExcludeDirs(): string[] {
   const arrayString = process.env.EXCLUDE_DIRS;
-  const excludeDirs = getArrayFromArrayString(arrayString);
+  const repoPath = getParseRepoPath();
+  const excludeDirs = getArrayFromArrayString(arrayString).map(dir => repoPath + '/' + dir);
   return excludeDirs;
 }
 
-function traverseDirAndParse(parser: Parser, repoPath: string, options: {excludeDirNames: string[], ext: string[]}) {
-  const {excludeDirNames = [], ext = []} = options;
+function traverseDirAndParse(parser: Parser, repoPath: string, options: {excludeDirs: string[], ext: string[]}) {
+  const {excludeDirs = [], ext = []} = options;
   let tempFilePath = repoPath;
   const temp = [repoPath];
   const parseResult = [];
@@ -93,7 +94,7 @@ function traverseDirAndParse(parser: Parser, repoPath: string, options: {exclude
     tempFilePath = temp.pop();
     const fileStat = fs.statSync(tempFilePath);
     if (fileStat.isFile()) {
-      if (ext.length && !ext.includes(path.extname(tempFilePath))) {
+      if (ext.length && !ext.includes(path.extname(tempFilePath)) && !excludeDirs.includes(tempFilePath)) {
         continue;
       }
       const fileStr = fs.readFileSync(tempFilePath, 'utf-8');
@@ -112,7 +113,8 @@ function traverseDirAndParse(parser: Parser, repoPath: string, options: {exclude
     else {
       const dirNames = fs.readdirSync(tempFilePath);
       for (const dirname of dirNames) {
-        if (!excludeDirNames || !excludeDirNames.includes(dirname)) {
+        const currentPath = tempFilePath + '/' + dirname;
+        if (!excludeDirs || !excludeDirs.includes(currentPath)) {
           temp.push(tempFilePath + '/' + dirname);
         }
       }

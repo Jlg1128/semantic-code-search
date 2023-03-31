@@ -42,7 +42,7 @@ the repo path to be parsed, absolute path
 
 **EXCLUDE_DIRS**
 
-ignore parse dirs, type to be string[]
+ignore parse dirs and files, relative path, type to be string[]
 
 **EXT**
 

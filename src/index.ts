@@ -6,7 +6,7 @@ import { Parser } from './parser/parserBase';
 import generateEmbedings from './generateEmbeddings';
 
 
-async function getParserInfo(): Promise<{parser: Parser, repoPath: string, parserPath: string, excludeDirNames: string[], ext: string[]}> {
+async function getParserInfo(): Promise<{parser: Parser, repoPath: string, parserPath: string, excludeDirs: string[], ext: string[]}> {
   const parserPath = PARSER_PATH + `/${getParserName()}`;
   const repoPath = getParseRepoPath();
   
@@ -24,15 +24,15 @@ async function getParserInfo(): Promise<{parser: Parser, repoPath: string, parse
     parser,
     repoPath,
     parserPath,
-    excludeDirNames: getExcludeDirs(),
+    excludeDirs: getExcludeDirs(),
     ext: getParseExt(),
   };
 }
 
 async function main() {
-  const {parser, repoPath, excludeDirNames, ext} = await getParserInfo();
-  const parseResult = traverseDirAndParse(parser, repoPath, {excludeDirNames, ext})
-  
+  const {parser, repoPath, excludeDirs, ext} = await getParserInfo();
+  const parseResult = traverseDirAndParse(parser, repoPath, {excludeDirs, ext})
+
   if (parseResult.length) {
     generateEmbedings(parseResult);
   }
