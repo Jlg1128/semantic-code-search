@@ -23,9 +23,9 @@ search code semantically for function search, logic multiplexing, can save devel
     then call http://localhost:3060/?keyword=testServer&target=example, you can set **DEFAULT_TARGET** in docker-compose.yml that you don't have to pass **target**
 
 ### Command Line Parameters
-**parseTarget**
+**target**
 
-when you run "npm run parse -- parseTarget=example", this program will read .example.env file and load environment variables
+when you run "npm run parse -- target=example", this program will read .example.env file and load environment variables
 
 ### Environment Variables
 **OPENAI_API_KEY**
@@ -35,6 +35,10 @@ get from https://platform.openai.com/account/api-keys
 **PARSER**
 
 put your parser function file to src/parser and should export default parser function in the file
+
+**BATCH_GEN_COUNT**
+
+call openai createEmbedding api input array max length, default = 12 
 
 **REPOPATH**
 

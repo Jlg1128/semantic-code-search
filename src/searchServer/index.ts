@@ -2,7 +2,9 @@ import * as express from 'express';
 import { Request } from "express";
 import searchFunction from '../searchFunction';
 import { loadEnv } from '../util';
-import { serverPort } from '../const';
+import { EnvMap, envFilePathGetter, serverPort } from '../const';
+import {parse} from 'dotenv';
+import * as fs from 'fs';
 
 const app = express();
 type SearchParams = {
@@ -13,7 +15,12 @@ type SearchParams = {
   lines?: number, // code lines
 }
 
+type EnvInfoParams = {
+  target: string;
+}
+
 let prevTarget: string;
+
 app.get('/', async (req: Request, res) => {
   const {keyword, model = 'text-embedding-ada-002', target = process.env.DEFAULT_TARGET, n = 3, lines} = req.query as unknown as SearchParams;
   if (!target) {
@@ -30,6 +37,20 @@ app.get('/', async (req: Request, res) => {
     res.json({code: 401, result: null, err: error, message: error?.message});
   }
 })
+
+app.get('/envInfo', (req: Request, res) => {
+  const {target = process.env.DEFAULT_TARGET} = req.query as unknown as EnvInfoParams;
+  let envMap: EnvMap;
+  if (target) {
+    const envFilePath = envFilePathGetter(target);
+    if (fs.existsSync(envFilePath)) {
+      const file = fs.readFileSync(envFilePath);
+      envMap = parse<EnvMap>(file);
+      delete envMap.OPENAI_API_KEY;
+    }
+  }
+  res.json({code: 200, result: envMap});
+});
 
 app.listen(serverPort, () => {
   console.log(`code-search server listening on port ${serverPort}`)

@@ -12,13 +12,14 @@
   ],
   "scripts": {
     "parse": "ts-node ./src/index.ts",
-    "parse:example": "npm run parse -- parseTarget=example",
     "search": "ts-node ./src/search.ts",
-    "search:example": "npm run search -- parseTarget=example",
     "build": "tsc --outDir dist/",
     "build:watch": "tsc --outDir dist/ --watch",
     "server": "ts-node src/searchServer/index.ts",
-    "server:watch": "nodemon -e ts -w src  -x npm run server"
+    "server:watch": "nodemon -e ts -w src  -x npm run server",
+    "parse:example": "npm run parse -- target=example",
+    "search:example": "npm run search -- target=example",
+    "server:example": "DEFAULT_TARGET=example npm run server"
   },
   "repository": {
     "url": "https://github.com/Jlg1128/semantic-code-search.git"
@@ -38,15 +39,16 @@
     "typescript": "^5.0.2"
   },
   "dependencies": {
-    "compute-cosine-similarity": "^1.0.0",
-    "csv-parser": "^3.0.0",
-    "dotenv": "^16.0.3",
-    "express": "^4.18.2",
-    "openai": "^3.2.1",
     "@babel/generator": "^7.21.3",
     "@babel/parser": "^7.21.3",
     "@babel/traverse": "^7.21.3",
     "@babel/types": "^7.21.3",
-    "babel-minify": "^0.5.2"
+    "babel-minify": "^0.5.2",
+    "compute-cosine-similarity": "^1.0.0",
+    "csv-parser": "^3.0.0",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "gpt-3-encoder": "^1.1.4",
+    "openai": "^3.2.1"
   }
 }

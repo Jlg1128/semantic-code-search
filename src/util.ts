@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Parser } from './parser/parserBase';
 import * as dotenv from 'dotenv';
-import { DOUBLE_QUOTES_PLACEHOLDER, ROOT_PATH } from './const';
+import { DOUBLE_QUOTES_PLACEHOLDER, ROOT_PATH, envFilePathGetter } from './const';
 import { Configuration, OpenAIApi } from 'openai';
 //@ts-ignore
 import * as minify from 'babel-minify';
@@ -12,11 +12,11 @@ interface ArgsMap {
 }
 let parseInfo: ArgsMap | undefined = undefined;
 
-function loadEnv(parseTarget?: string) {
-  if (!parseTarget) {
-    parseTarget = getParseArgs().parseTarget || 'example';
+function loadEnv(target?: string) {
+  if (!target) {
+    target = getParseArgs().target;
   }
-  const envFile = ROOT_PATH + `/.${parseTarget}.env`;
+  const envFile = envFilePathGetter(target);
   dotenv.config({path: envFile, override: true});
   console.log(`current using ===> ${envFile} as env file`)
 }
@@ -112,9 +112,10 @@ function traverseDirAndParse(parser: Parser, repoPath: string, options: {exclude
     }
     else {
       const dirNames = fs.readdirSync(tempFilePath);
+      const ignoreDirNames = ['node_modules'];
       for (const dirname of dirNames) {
         const currentPath = tempFilePath + '/' + dirname;
-        if (!excludeDirs || !excludeDirs.includes(currentPath)) {
+        if ((!excludeDirs || !excludeDirs.includes(currentPath)) && !ignoreDirNames.includes(dirname)) {
           temp.push(tempFilePath + '/' + dirname);
         }
       }

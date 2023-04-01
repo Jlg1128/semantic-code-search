@@ -17,20 +17,18 @@ const cache: Cache = {}
 
 export default async function search(codeQuery: string, n = 3, lines?: number | undefined) { 
   const dataFilePath = dataFilePathGetter();
+  // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     if (!fs.existsSync(dataFilePath)) {
       return reject(new Error('embedding file not exists'));
     }
-    let queryEmbedding: number[];
-    try {
-      queryEmbedding = await getEmbedding(codeQuery);
-    } catch (error) {
-      return reject(error?.message);
-    }
+    const queryEmbedding = await getEmbedding([codeQuery]);
     getCSVSource(dataFilePath).then(df => {
-      df.forEach((dfItem: CSVDataItem, index) => {
+      df.forEach((dfItem: CSVDataItem) => {
         const embeddingItem = eval(dfItem.codeEmbedding);
-        dfItem['similarity'] = similarity(embeddingItem, queryEmbedding);
+        if (embeddingItem) {
+          dfItem['similarity'] = similarity(embeddingItem, queryEmbedding[0].embedding);
+        }
       })
       const searchResult = [...df.sort((a, b) => b.similarity - a.similarity)].slice(0, n).map(item => {
         Object.entries(item).forEach(([key, value]) => {
@@ -46,6 +44,7 @@ export default async function search(codeQuery: string, n = 3, lines?: number | 
       });
       resolve(searchResult);
     }).catch(err => {
+      console.log(`read CSV ${dataFilePath} error`, err);
       reject(err);
     });
   })
