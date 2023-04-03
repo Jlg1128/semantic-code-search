@@ -1,0 +1,43 @@
+functionName,code,comment,filePath
+config,"function({name}) {
+    data.deployType = window.deployType;
+  }", 12312,src/index.js
+config,"config(data) {
+    data.deployType = window.deployType;
+  }",,src/index.js
+a,"a = () => {
+  console.log('123123')
+}","*
+ * 热更新替换
+ * 1. custom/hotAssets/version.conf version.conf 进行比较
+ * 2. 如果是新的则进行替换
+ * 3. cp -Rf custom/hotAssets/static/* src/app/public
+ * 4. cp -Rf custom/hotAssets/views/* src/webapp/views
+ * 5. 替换config.appConfig.commit
+ ",src/index.js
+test2,"function() {
+  console.log('test2')
+}",,src/index.js
+test,"function test() {
+  return '我是test'
+}","*
+ * 热更新替换
+ * 1. custom/hotAssets/version.conf version.conf 进行比较
+ * 2. 如果是新的则进行替换
+ * 3. cp -Rf custom/hotAssets/static/* src/app/public
+ * 4. cp -Rf custom/hotAssets/views/* src/webapp/views
+ * 5. 替换config.appConfig.commit
+ ",src/index.js
+constructor,"constructor() {
+
+  }",,src/index.js
+getName,"getName() {
+    123123
+  }","*
+   * getName comment
+   ",src/index.js
+getAge,"getAge() {
+
+  }","*
+   * getAge comment
+   ",src/index.js
