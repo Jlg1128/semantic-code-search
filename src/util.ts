@@ -3,7 +3,6 @@ import * as path from 'path';
 import { Parser } from './parser/parserBase';
 import * as dotenv from 'dotenv';
 import { DOUBLE_QUOTES_PLACEHOLDER, ROOT_PATH, envFilePathGetter } from './const';
-import { Configuration, OpenAIApi } from 'openai';
 //@ts-ignore
 import * as minify from 'babel-minify';
 
@@ -14,27 +13,13 @@ let parseInfo: ArgsMap | undefined = undefined;
 
 function loadEnv(target?: string) {
   if (!target) {
-    target = getParseArgs().target;
+    target = getParseArgs().target || process.env.DEFAULT_TARGET;
   }
   const envFile = envFilePathGetter(target);
   dotenv.config({path: envFile, override: true});
   console.log(`current using ===> ${envFile} as env file`)
 }
 
-let configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-let openai = new OpenAIApi(configuration);
-
-function getOpenaiApi() {
-  if (process.env.OPENAI_API_KEY && configuration.apiKey !== process.env.OPENAI_API_KEY) {
-    configuration = new Configuration({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-    openai = new OpenAIApi(configuration);
-  }
-  return openai;
-}
 
 function getParseArgs(): ArgsMap{
   if (parseInfo) return parseInfo
@@ -152,5 +137,4 @@ export {
   loadEnv,
   minifyCode,
   csvStringReplace,
-  getOpenaiApi,
 }

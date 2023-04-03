@@ -7,22 +7,28 @@ import * as pd from './node-pandas/src';
 import { CSVData, CSVDataItem } from './generateEmbeddings';
 import { csvStringReplace } from './util';
 import { dataFilePathGetter } from './const';
-import { getEmbedding } from './embeddingUtil';
+import { getEmbedding } from './openAIUtil';
 
 type Cache = {
   [key: string]: any,
 }
 
 const cache: Cache = {}
+type SearchOptions = {
+  model?: string,
+  n?: number,
+  lines?: number | undefined,
+}
 
-export default async function search(codeQuery: string, n = 3, lines?: number | undefined) { 
+export default async function search(codeQuery: string, options: SearchOptions) { 
+  const {n = 3, model = 'text-embedding-ada-002', lines} = options;
   const dataFilePath = dataFilePathGetter();
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     if (!fs.existsSync(dataFilePath)) {
       return reject(new Error('embedding file not exists'));
     }
-    const queryEmbedding = await getEmbedding([codeQuery]);
+    const queryEmbedding = await getEmbedding([codeQuery], model);
     getCSVSource(dataFilePath).then(df => {
       df.forEach((dfItem: CSVDataItem) => {
         const embeddingItem = eval(dfItem.codeEmbedding);

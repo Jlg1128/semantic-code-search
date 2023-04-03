@@ -22,6 +22,8 @@ export const ROOT_PATH = path.resolve(__dirname, '../');
 export const PARSER_PATH = ROOT_PATH + '/src/parser';
 export const DATA_PATH = ROOT_PATH + '/data';
 export const DEFAULT_BATCH_COUNT = 12;
+export const DEFAULT_EMBEDDING_MODEL = 'text-embedding-ada-002';
+export const DEFAULT_CHAT_COMPLETION_MODEL = 'gpt-3.5-turbo';
 export const dataFileNameGetter = () => `${getParseRepoName()}-${getParserName()}.csv`;
 export const dataFilePathGetter = () => DATA_PATH + `/${getParseRepoName()}-${getParserName()}.csv`;
 export const DOUBLE_QUOTES_PLACEHOLDER = '@@';

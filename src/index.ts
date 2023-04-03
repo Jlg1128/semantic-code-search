@@ -1,7 +1,7 @@
 import { getExcludeDirs, getParseExt, getParseRepoPath, getParserName, loadEnv, traverseDirAndParse } from './util';
 loadEnv();
 import * as fs from 'fs';
-import { PARSER_PATH } from './const';
+import { DEFAULT_EMBEDDING_MODEL, PARSER_PATH } from './const';
 import { Parser } from './parser/parserBase';
 import generateEmbedings from './generateEmbeddings';
 
@@ -34,7 +34,7 @@ async function main() {
   const parseResult = traverseDirAndParse(parser, repoPath, {excludeDirs, ext})
 
   if (parseResult.length) {
-    generateEmbedings(parseResult);
+    generateEmbedings(parseResult, process.env.EMBEDDING_MODEL || DEFAULT_EMBEDDING_MODEL);
   }
 }
 

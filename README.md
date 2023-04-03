@@ -20,7 +20,7 @@ search code semantically for function search, logic multiplexing, can save devel
     docker compose build
     docker compose up
     ```
-    then call http://localhost:3060/?keyword=testServer&target=example, you can set **DEFAULT_TARGET** in docker-compose.yml that you don't have to pass **target**
+    then call http://localhost:3060/search?keyword=testServer&target=example, you can set **DEFAULT_TARGET** in docker-compose.yml that you don't have to pass **target**
 
 ### Command Line Parameters
 **target**
@@ -35,6 +35,14 @@ get from https://platform.openai.com/account/api-keys
 **PARSER**
 
 put your parser function file to src/parser and should export default parser function in the file
+
+**EMBEDDING_MODEL**
+
+embedding model name
+
+**CHAT_COMPLETION_MODEL**
+
+compeletion model name
 
 **BATCH_GEN_COUNT**
 
