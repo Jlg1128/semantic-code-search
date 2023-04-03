@@ -1,3 +1,6 @@
+# 0.3.2
+### Features
+- add chat api
 # 0.3.1
 ### Features
 - add new environment variable BATCH_GEN_COUNT, default 12
