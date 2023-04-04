@@ -1,6 +1,7 @@
 import { ChatCompletionRequestMessage, CreateEmbeddingResponseDataInner } from 'openai';
 import { Configuration, OpenAIApi } from 'openai';  
 import { DEFAULT_CHAT_COMPLETION_MODEL } from '../const';
+import { CreateChatCompletionResponse } from 'openai';
 
 function getOpenaiApi() {
   if (!process.env.OPENAI_API_KEY) {
@@ -15,6 +16,39 @@ function getOpenaiApi() {
 }
 
 const openaiApi = getOpenaiApi();
+
+export const parseOpenAIStream = (chatResponse: CreateChatCompletionResponse, callback: (token: string) => any) => {
+  return new Promise((resolve) => {
+    let result = "";
+    // @ts-ignore
+    chatResponse.on("data", (data) => {
+        const lines = data
+            ?.toString()
+            ?.split("\n")
+            .filter((line: string) => line.trim() !== "");
+            
+        for (const line of lines) {
+            const message = line.replace(/^data: /, "");
+            if (message == "[DONE]") {
+                resolve(result);
+            } else {
+                let token: string;
+                try {
+                    token = JSON.parse(message)?.choices[0].delta?.content || ''
+                } catch(error) {
+                    console.log("error", error);
+                }
+
+                result += token;
+                
+                if (token) {
+                    callback(token);
+                }
+            }
+        }
+    });
+  });
+}
 
 async function getEmbedding(texts: string[], model: string): Promise<CreateEmbeddingResponseDataInner[] | undefined> {
   texts = texts.map(text => text.replace("\n", " "));

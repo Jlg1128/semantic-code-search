@@ -5,12 +5,7 @@ import { DEFAULT_BATCH_COUNT, DEFAULT_EMBEDDING_MODEL, dataFilePathGetter } from
 import { getEmbedding } from './openAIUtil';
 import { csvStringReplace } from './util';
 import { CreateEmbeddingResponseDataInner } from 'openai';
-
-export type CSVDataItem = ParseResultItem & {
-  codeEmbedding: string,
-  similarity?: number,
-}
-export type CSVData = CSVDataItem[]
+import { CSVData } from './types';
 
 function batchGenerate(batchDatas: CSVData, embeddingResponseData: CreateEmbeddingResponseDataInner[]) {
   batchDatas.forEach((batchDataItem, index) => {

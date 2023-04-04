@@ -5,6 +5,10 @@ import * as dotenv from 'dotenv';
 import { DOUBLE_QUOTES_PLACEHOLDER, ROOT_PATH, envFilePathGetter } from './const';
 //@ts-ignore
 import * as minify from 'babel-minify';
+import * as csv from 'csv-parser';
+// @ts-ignore
+import * as pd from './node-pandas/src';
+import { CSVData } from './types';
 
 interface ArgsMap {
   [key: string]: string
@@ -123,6 +127,30 @@ function csvStringReplace(str: string, type: 'set' | 'get' = 'set'): string {
     return '"' + str.replace(/"/g, DOUBLE_QUOTES_PLACEHOLDER) + '"';
   }
   return str.replace(new RegExp(DOUBLE_QUOTES_PLACEHOLDER, 'g'), '"');
+}
+
+type Cache = {
+  [key: string]: any,
+}
+const cache: Cache = {}
+
+export function getCSVSource(dataFilePath: string): Promise<CSVData> {
+  return new Promise((resolve, reject) => {
+    if (cache[dataFilePath]) {
+      resolve(cache[dataFilePath])
+    } else {
+      const results: CSVData = []
+      fs.createReadStream(dataFilePath)
+      .pipe(csv())
+      .on('data', (data) => results.push(data))
+      .on('end', () => {
+        resolve(cache[dataFilePath] = pd.DataFrame(results));
+      }).on('error', (err) => {
+        delete cache[dataFilePath];
+        reject(err);
+      });
+    }
+  })
 }
 
 

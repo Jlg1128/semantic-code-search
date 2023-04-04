@@ -1,26 +1,27 @@
-import * as csv from 'csv-parser';
 import * as fs from 'fs';
 // @ts-ignore
 import * as similarity from 'compute-cosine-similarity';
 // @ts-ignore
-import * as pd from './node-pandas/src';
-import { CSVData, CSVDataItem } from './generateEmbeddings';
-import { csvStringReplace } from './util';
+import { csvStringReplace, getCSVSource } from './util';
 import { dataFilePathGetter } from './const';
 import { getEmbedding } from './openAIUtil';
+import { CSVDataItem } from './types';
 
-type Cache = {
-  [key: string]: any,
-}
-
-const cache: Cache = {}
 type SearchOptions = {
   model?: string,
   n?: number,
   lines?: number | undefined,
 }
 
-export default async function search(codeQuery: string, options: SearchOptions) { 
+type SearchItem = {
+  filePath: string,
+  functionName: string,
+  code: string,
+  score: number,
+}
+type SearchResult = SearchItem[];
+
+export default async function search(codeQuery: string, options: SearchOptions): Promise<SearchResult | undefined> { 
   const {n = 3, model = 'text-embedding-ada-002', lines} = options;
   const dataFilePath = dataFilePathGetter();
   // eslint-disable-next-line no-async-promise-executor
@@ -53,24 +54,5 @@ export default async function search(codeQuery: string, options: SearchOptions) 
       console.log(`read CSV ${dataFilePath} error`, err);
       reject(err);
     });
-  })
-}
-
-function getCSVSource(dataFilePath: string): Promise<CSVData> {
-  return new Promise((resolve, reject) => {
-    if (cache[dataFilePath]) {
-      resolve(cache[dataFilePath])
-    } else {
-      const results: CSVData = []
-      fs.createReadStream(dataFilePath)
-      .pipe(csv())
-      .on('data', (data) => results.push(data))
-      .on('end', () => {
-        resolve(cache[dataFilePath] = pd.DataFrame(results));
-      }).on('error', (err) => {
-        delete cache[dataFilePath];
-        reject(err);
-      });
-    }
   })
 }

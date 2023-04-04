@@ -7,9 +7,8 @@ import searchFunction from '../searchFunction';
 import { DEFAULT_CHAT_COMPLETION_MODEL, EnvMap, envFilePathGetter, serverPort } from '../const';
 import {parse} from 'dotenv';
 import * as fs from 'fs';
-import { chat, completion } from '../openAIUtil';
+import { chat, completion, parseOpenAIStream } from '../openAIUtil';
 import { errorResponse } from './util';
-import { parseOpenAIStream } from './openAI';
 
 const app = express();
 app.use(bodyParser.json());
