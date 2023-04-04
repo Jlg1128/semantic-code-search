@@ -9,6 +9,7 @@ import {parse} from 'dotenv';
 import * as fs from 'fs';
 import { chat, completion, parseOpenAIStream } from '../openAIUtil';
 import { errorResponse } from './util';
+import * as path from 'path';
 
 const app = express();
 app.use(bodyParser.json());
@@ -43,6 +44,11 @@ app.get('/search', async (req: Request, res) => {
   }
   try {
     const searchResult = await searchFunction(keyword, {n, lines, model});
+    if (searchResult && process.env.RELATIVE_ROOT_URL) {
+      searchResult.forEach((searchItem) => {
+        searchItem.filePath = path.join(process.env.RELATIVE_ROOT_URL, searchItem.filePath);
+      })
+    }
     res.json({code: 200, result: searchResult, err: null});
   } catch (error) {
     return errorResponse(res, 401, error);

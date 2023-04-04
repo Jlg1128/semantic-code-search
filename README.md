@@ -60,6 +60,10 @@ ignore parse dirs and files, relative path, type to be string[]
 
 parse file ext, type to be string[]
 
+**RELATIVE_ROOT_URL**
+
+searchResultItem.filePath will concat RELATIVE_ROOT_URL
+
 ### Search API CALL Parameters
 
 **keyword**
