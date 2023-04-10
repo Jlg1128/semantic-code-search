@@ -1,10 +1,10 @@
 import * as express from 'express';
 import { Request } from "express";
 import * as bodyParser from 'body-parser';
-import { loadEnv } from '../util';
+import { getCSVSource, loadEnv } from '../util';
 loadEnv();
 import searchFunction from '../searchFunction';
-import { DEFAULT_CHAT_COMPLETION_MODEL, EnvMap, envFilePathGetter, serverPort } from '../const';
+import { DEFAULT_CHAT_COMPLETION_MODEL, EnvMap, dataFilePathGetter, envFilePathGetter, serverPort } from '../const';
 import {parse} from 'dotenv';
 import * as fs from 'fs';
 import { chat, completion, parseOpenAIStream } from '../openAIUtil';
@@ -31,13 +31,14 @@ type CompletionParams = {
   model?: string;
 }
 
-let prevTarget: string;
+let prevTarget: string = process.env.DEFAULT_TARGET;
 
 app.get('/search', async (req: Request, res) => {
   const {keyword, model, target = process.env.DEFAULT_TARGET, n = 3, lines} = req.query as unknown as SearchParams;
   if (!target) {
     return errorResponse(res, 401, new Error('target not specified'));
   }
+  console.log('search target:', target);
   if (prevTarget !== target) {
     loadEnv(target);
     prevTarget = target;
@@ -89,7 +90,33 @@ app.get('/chat', async (req: Request, res) => {
 //    return res.json({code: 200})
 // });
 
-app.listen(serverPort, () => {
-  console.log(`server listening on port ${serverPort}`)
-})
+function preload() {
+  const dataFilePath = dataFilePathGetter();
+  return new Promise((resolve, reject) => {
+    if (fs.existsSync(dataFilePath)) {
+      console.log('resource preload...');
+      getCSVSource(dataFilePath)
+      .then(() => resolve(true))
+      .catch((error) => reject(error));
+    } else {
+      resolve(true);
+    }
+  })
+}
 
+function startApp() {
+  app.listen(serverPort, () => {
+    console.log(`server listening on port ${serverPort}`)
+  })
+}
+
+function main() {
+  preload().then(() => {
+    startApp();
+  }).catch(err => {
+    console.log('resource preload failed:', err?.message);
+    startApp();
+  })
+}
+
+main();
