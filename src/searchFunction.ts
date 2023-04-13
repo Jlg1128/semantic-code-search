@@ -5,7 +5,7 @@ import * as similarity from 'compute-cosine-similarity';
 import { csvStringReplace, getCSVSource } from './util';
 import { dataFilePathGetter } from './const';
 import { getEmbedding } from './openAIUtil';
-import { CSVDataItem } from './types';
+import { CSVData, CSVDataItem } from './types';
 
 type SearchOptions = {
   model?: string,
@@ -21,6 +21,15 @@ type SearchItem = {
 }
 type SearchResult = SearchItem[];
 
+function computeDatasSimilarity(datas: CSVData, queryEmbedding: number[]) {
+  datas.forEach((dfItem: CSVDataItem) => {
+    const embeddingItem = eval(dfItem.codeEmbedding);
+    if (embeddingItem) {
+      dfItem['similarity'] = similarity(embeddingItem, queryEmbedding);
+    }
+  })
+}
+
 export default async function search(codeQuery: string, options: SearchOptions): Promise<SearchResult | undefined> { 
   const {n = 3, model = 'text-embedding-ada-002', lines} = options;
   const dataFilePath = dataFilePathGetter();
@@ -31,13 +40,12 @@ export default async function search(codeQuery: string, options: SearchOptions):
     }
     const queryEmbedding = await getEmbedding([codeQuery], model);
     getCSVSource(dataFilePath).then(df => {
-      df.forEach((dfItem: CSVDataItem) => {
-        const embeddingItem = eval(dfItem.codeEmbedding);
-        if (embeddingItem) {
-          dfItem['similarity'] = similarity(embeddingItem, queryEmbedding[0].embedding);
-        }
-      })
-      const searchResult = [...df.sort((a, b) => b.similarity - a.similarity)].slice(0, n).map(item => {
+      df = Array.from(df);
+      const dfFirst = Math.floor(df.length / 2);
+      const dfSecond = df.length - dfFirst;
+      computeDatasSimilarity(df.slice(0, dfFirst), queryEmbedding[0].embedding);
+      computeDatasSimilarity(df.slice(dfFirst, dfSecond), queryEmbedding[0].embedding);
+      const searchResult = df.sort((a, b) => b.similarity - a.similarity).slice(0, n).map(item => {
         Object.entries(item).forEach(([key, value]) => {
             // @ts-ignore
             item[key] = csvStringReplace(value, 'get');
